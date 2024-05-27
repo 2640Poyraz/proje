@@ -1,0 +1,34 @@
+from machine import Pin, PWM
+from dcmotor import DCMotor
+from time import sleep
+from hcsr04 import HCSR04
+
+frequency=15000
+
+distanceSensor = HCSR04(trigger_pin=5, echo_pin=18, echo_timeout_us=10000)
+
+
+pin1 = Pin(12, Pin.OUT)
+pin2 = Pin(14, Pin.OUT)
+enable = PWM(Pin(13), frequency)
+
+dc_motor = DCMotor(pin1, pin2, enable)
+
+while True:
+    sleep(0.25)
+    distance = distanceSensor.distance_cm()
+    print("Mesafe: ", distance, " cm") 
+
+    if distance <= 10:
+        print("Mesafe 10 cm'nin altında motor duruyor")
+        dc_motor.stop()
+        sleep(1)
+        print("Motor geri gidiyor")
+        dc_motor.backwards(90)
+        sleep(2)
+        print("Motor tekrar duruyor")
+        dc_motor.stop()
+        break
+    else:
+        print("Mesafe 10 cm'den büyük motor ileri gidiyor")
+        dc_motor.forward(25)
